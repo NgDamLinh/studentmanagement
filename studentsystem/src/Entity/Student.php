@@ -12,32 +12,36 @@ class Student
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'integer')]
+    private $id;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(type: 'integer')]
+    private $stuId;
 
-    #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $Name;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $phoneNum = null;
+    #[ORM\Column(type: 'date')]
+    private $DOB;
 
-    #[ORM\ManyToMany(targetEntity: Subject::class, mappedBy: 'classNum')]
-    private Collection $subjects;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $Sex;
 
-    #[ORM\OneToMany(mappedBy: 'majorName', targetEntity: Major::class)]
-    private Collection $majors;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $Address;
 
-    #[ORM\ManyToMany(targetEntity: ClassRoom::class, mappedBy: 'classNum')]
-    private Collection $classRooms;
+    #[ORM\Column(type: 'string', length: 255)]
+    private $Image;
+
+    #[ORM\ManyToOne(targetEntity: Classes::class, inversedBy: 'students')]
+    private $classId;
+
+    #[ORM\OneToMany(mappedBy: 'student', targetEntity: Mark::class)]
+    private $Mark;
 
     public function __construct()
     {
-        $this->subjects = new ArrayCollection();
-        $this->majors = new ArrayCollection();
-        $this->classRooms = new ArrayCollection();
+        $this->Mark = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -45,121 +49,115 @@ class Student
         return $this->id;
     }
 
+    public function getStuId(): ?int
+    {
+        return $this->stuId;
+    }
+
+    public function setStuId(int $stuId): self
+    {
+        $this->stuId = $stuId;
+
+        return $this;
+    }
+
     public function getName(): ?string
     {
-        return $this->name;
+        return $this->Name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $Name): self
     {
-        $this->name = $name;
+        $this->Name = $Name;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getDOB(): ?\DateTimeInterface
     {
-        return $this->email;
+        return $this->DOB;
     }
 
-    public function setEmail(string $email): self
+    public function setDOB(\DateTimeInterface $DOB): self
     {
-        $this->email = $email;
+        $this->DOB = $DOB;
 
         return $this;
     }
 
-    public function getPhoneNum(): ?int
+    public function getSex(): ?string
     {
-        return $this->phoneNum;
+        return $this->Sex;
     }
 
-    public function setPhoneNum(?int $phoneNum): self
+    public function setSex(string $Sex): self
     {
-        $this->phoneNum = $phoneNum;
+        $this->Sex = $Sex;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->Address;
+    }
+
+    public function setAddress(string $Address): self
+    {
+        $this->Address = $Address;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->Image;
+    }
+
+    public function setImage(string $Image): self
+    {
+        $this->Image = $Image;
+
+        return $this;
+    }
+
+    public function getClassId(): ?Classes
+    {
+        return $this->classId;
+    }
+
+    public function setClassId(?Classes $classId): self
+    {
+        $this->classId = $classId;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Subject>
+     * @return Collection<int, Mark>
      */
-    public function getSubjects(): Collection
+    public function getMark(): Collection
     {
-        return $this->subjects;
+        return $this->Mark;
     }
 
-    public function addSubject(Subject $subject): self
+    public function addMark(Mark $mark): self
     {
-        if (!$this->subjects->contains($subject)) {
-            $this->subjects->add($subject);
-            $subject->addClassNum($this);
+        if (!$this->Mark->contains($mark)) {
+            $this->Mark[] = $mark;
+            $mark->setStudent($this);
         }
 
         return $this;
     }
 
-    public function removeSubject(Subject $subject): self
+    public function removeMark(Mark $mark): self
     {
-        if ($this->subjects->removeElement($subject)) {
-            $subject->removeClassNum($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Major>
-     */
-    public function getMajors(): Collection
-    {
-        return $this->majors;
-    }
-
-    public function addMajor(Major $major): self
-    {
-        if (!$this->majors->contains($major)) {
-            $this->majors->add($major);
-            $major->setMajorName($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMajor(Major $major): self
-    {
-        if ($this->majors->removeElement($major)) {
+        if ($this->Mark->removeElement($mark)) {
             // set the owning side to null (unless already changed)
-            if ($major->getMajorName() === $this) {
-                $major->setMajorName(null);
+            if ($mark->getStudent() === $this) {
+                $mark->setStudent(null);
             }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ClassRoom>
-     */
-    public function getClassRooms(): Collection
-    {
-        return $this->classRooms;
-    }
-
-    public function addClassRoom(ClassRoom $classRoom): self
-    {
-        if (!$this->classRooms->contains($classRoom)) {
-            $this->classRooms->add($classRoom);
-            $classRoom->addClassNum($this);
-        }
-
-        return $this;
-    }
-
-    public function removeClassRoom(ClassRoom $classRoom): self
-    {
-        if ($this->classRooms->removeElement($classRoom)) {
-            $classRoom->removeClassNum($this);
         }
 
         return $this;

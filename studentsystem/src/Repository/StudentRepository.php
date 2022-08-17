@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Student;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,46 +23,56 @@ class StudentRepository extends ServiceEntityRepository
         parent::__construct($registry, Student::class);
     }
 
-    public function add(Student $entity, bool $flush = false): void
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function add(Student $entity, bool $flush = true): void
     {
-        $this->getEntityManager()->persist($entity);
-
+        $this->_em->persist($entity);
         if ($flush) {
-            $this->getEntityManager()->flush();
+            $this->_em->flush();
         }
     }
 
-    public function remove(Student $entity, bool $flush = false): void
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function remove(Student $entity, bool $flush = true): void
     {
-        $this->getEntityManager()->remove($entity);
-
+        $this->_em->remove($entity);
         if ($flush) {
-            $this->getEntityManager()->flush();
+            $this->_em->flush();
         }
     }
 
-//    /**
-//     * @return Student[] Returns an array of Student objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    // /**
+    //  * @return Student[] Returns an array of Student objects
+    //  */
+    /*
+    public function findByExampleField($value)
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.exampleField = :val')
+            ->setParameter('val', $value)
+            ->orderBy('s.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    */
 
-//    public function findOneBySomeField($value): ?Student
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /*
+    public function findOneBySomeField($value): ?Student
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.exampleField = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+    */
 }
